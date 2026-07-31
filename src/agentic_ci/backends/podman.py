@@ -36,7 +36,7 @@ class PodmanBackend(Backend):
     ):
         super().__init__(workdir=workdir, image=image, harness=harness)
         self.timeout = timeout
-        self._container_name = f"agentic-ci-{uuid4().hex[:8]}"
+        self._container_name = f"agentic-ci-{uuid4().hex}"
         self._config_dir = None
         self._extra_env = extra_env or {}
 

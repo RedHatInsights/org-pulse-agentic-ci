@@ -180,9 +180,9 @@ def test_container_name_has_prefix(tmp_path, claude_harness):
     """Container name must start with 'agentic-ci-' for easy identification."""
     backend = PodmanBackend(workdir=str(tmp_path), harness=claude_harness)
     assert backend._container_name.startswith("agentic-ci-")
-    # The suffix is an 8-char hex string
+    # The suffix is a full 32-char hex string (uuid4)
     suffix = backend._container_name[len("agentic-ci-") :]
-    assert len(suffix) == 8
+    assert len(suffix) == 32
     int(suffix, 16)  # raises ValueError if not valid hex
 
 
