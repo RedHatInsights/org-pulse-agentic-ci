@@ -1,0 +1,141 @@
+# Merged Claude Code sandbox image for org-pulse RFE assessment.
+#
+# Single-Containerfile build combining openshell-base + claude-sandbox layers
+# for Konflux compatibility. Uses RedHatInsights/org-pulse-skills-registry
+# instead of the upstream opendatahub-io/skills-registry.
+#
+# Build:
+#   podman build -t claude-sandbox-hp -f images/runner/claude-code/Containerfile.org-pulse .
+#
+# To sync with upstream: merge upstream changes to Containerfile.openshell-base
+# and Containerfile.openshell into this file. The only org-pulse-specific
+# difference is the marketplace add target on the plugin seed line.
+
+# ═══════════════════════════════════════════════════════════════════════
+# Layer 1: openshell-base equivalent
+# ═══════════════════════════════════════════════════════════════════════
+
+FROM registry.access.redhat.com/ubi9/ubi-minimal:9.6
+
+ARG UV_VERSION=0.11.33
+ARG UV_SHA256=3e95b84d8a8b3390c91584d4fd0c4d326e951da2b8fb15a76719368af2795424
+
+ARG SHELLCHECK_VERSION=0.11.0
+ARG SHELLCHECK_SHA256=8c3be12b05d5c177a04c29e3c78ce89ac86f1595681cab149b65b97c4e227198
+
+ARG GH_VERSION=2.96.0
+ARG GH_SHA256=83d5c2ccad5498f58bf6368acb1ab32588cf43ab3a4b1c301bf36328b1c8bd60
+
+ARG GLAB_VERSION=1.110.0
+ARG GLAB_SHA256=978485e47c90b5c7d33638944838f28ddc5cb6833f01c9a0a80011a27d2766e3
+
+ARG CLAUDE_VERSION=2.1.220
+ARG CLAUDE_SHA256=674f61f20ff306f3100cf9200e4c36c4b70278b5bef2884549819b942a89c863
+
+RUN microdnf install -y --nodocs \
+        python3.12 \
+        python3.12-pip \
+        git \
+        jq \
+        make \
+        which \
+        tar \
+        xz \
+        gzip \
+        findutils \
+        shadow-utils \
+        iproute \
+    && microdnf clean all
+
+RUN ln -sf /usr/bin/python3.12 /usr/local/bin/python3 \
+    && ln -sf /usr/bin/python3.12 /usr/local/bin/python
+
+RUN groupadd -g 998 sandbox \
+    && useradd -u 998 -g sandbox -m -d /sandbox -s /bin/bash sandbox
+
+# uv (pinned)
+RUN curl -fsSL -o /tmp/uv.tar.gz \
+        "https://github.com/astral-sh/uv/releases/download/${UV_VERSION}/uv-x86_64-unknown-linux-musl.tar.gz" \
+    && echo "${UV_SHA256}  /tmp/uv.tar.gz" | sha256sum -c - \
+    && tar -xzf /tmp/uv.tar.gz -C /tmp \
+    && mv /tmp/uv-x86_64-unknown-linux-musl/uv /usr/local/bin/uv \
+    && chmod +x /usr/local/bin/uv \
+    && rm -rf /tmp/uv.tar.gz /tmp/uv-x86_64-unknown-linux-musl
+
+# GitHub CLI (pinned)
+RUN curl -fsSL -o /tmp/gh.tar.gz \
+        "https://github.com/cli/cli/releases/download/v${GH_VERSION}/gh_${GH_VERSION}_linux_amd64.tar.gz" \
+    && echo "${GH_SHA256}  /tmp/gh.tar.gz" | sha256sum -c - \
+    && tar -xzf /tmp/gh.tar.gz -C /tmp \
+    && mv /tmp/gh_${GH_VERSION}_linux_amd64/bin/gh /usr/local/bin/gh \
+    && chmod +x /usr/local/bin/gh \
+    && rm -rf /tmp/gh.tar.gz /tmp/gh_${GH_VERSION}_linux_amd64
+
+# GitLab CLI (pinned)
+RUN curl -fsSL -o /tmp/glab.tar.gz \
+        "https://gitlab.com/gitlab-org/cli/-/releases/v${GLAB_VERSION}/downloads/glab_${GLAB_VERSION}_linux_amd64.tar.gz" \
+    && echo "${GLAB_SHA256}  /tmp/glab.tar.gz" | sha256sum -c - \
+    && tar -xzf /tmp/glab.tar.gz -C /tmp \
+    && mv /tmp/bin/glab /usr/local/bin/glab \
+    && chmod +x /usr/local/bin/glab \
+    && rm -rf /tmp/glab.tar.gz /tmp/bin
+
+# ShellCheck (pinned)
+RUN curl -fsSL -o /tmp/shellcheck.tar.xz \
+        "https://github.com/koalaman/shellcheck/releases/download/v${SHELLCHECK_VERSION}/shellcheck-v${SHELLCHECK_VERSION}.linux.x86_64.tar.xz" \
+    && echo "${SHELLCHECK_SHA256}  /tmp/shellcheck.tar.xz" | sha256sum -c - \
+    && tar -xJf /tmp/shellcheck.tar.xz -C /tmp \
+    && mv /tmp/shellcheck-v${SHELLCHECK_VERSION}/shellcheck /usr/local/bin/shellcheck \
+    && chmod +x /usr/local/bin/shellcheck \
+    && rm -rf /tmp/shellcheck.tar.xz /tmp/shellcheck-v${SHELLCHECK_VERSION}
+
+COPY images/runner/shared/entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY pyproject.toml README.md /tmp/agentic-ci/
+COPY src/ /tmp/agentic-ci/src/
+RUN chmod +x /usr/local/bin/entrypoint.sh \
+    && uv pip install --system --python python3.12 --no-cache /tmp/agentic-ci ruff==0.16.0 \
+    && rm -rf /tmp/agentic-ci \
+    && install -d -m 755 -o sandbox /usr/local/share/agentic-ci
+
+# Sandbox home directories
+USER sandbox
+RUN mkdir -p /sandbox/.local/bin /sandbox/.config /sandbox/.claude /sandbox/.agents
+COPY --chown=sandbox:sandbox images/runner/shared/AGENTS.openshell.md /sandbox/AGENTS.md
+RUN ln -s AGENTS.md /sandbox/CLAUDE.md \
+    && ln -s ../AGENTS.md /sandbox/.claude/CLAUDE.md
+ENV PATH="/sandbox/.local/bin:${PATH}"
+
+WORKDIR /sandbox
+
+# ═══════════════════════════════════════════════════════════════════════
+# Layer 2: Claude Code + plugin seed
+# ═══════════════════════════════════════════════════════════════════════
+
+USER root
+
+RUN microdnf module enable -y nodejs:22 \
+    && microdnf install -y --nodocs nodejs npm \
+    && microdnf clean all
+
+RUN curl -fsSL -o /usr/local/bin/claude \
+        "https://downloads.claude.ai/claude-code-releases/${CLAUDE_VERSION}/linux-x64/claude" \
+    && echo "${CLAUDE_SHA256}  /usr/local/bin/claude" | sha256sum -c - \
+    && chmod +x /usr/local/bin/claude
+
+USER sandbox
+
+RUN git config --global url."https://github.com/".insteadOf "git@github.com:" \
+    && export CLAUDE_CONFIG_DIR=/sandbox/.claude \
+    && export CLAUDE_CODE_PLUGIN_CACHE_DIR=/sandbox/.claude-seed \
+    && export DISABLE_AUTOUPDATER=1 \
+    && claude plugin marketplace add RedHatInsights/org-pulse-skills-registry \
+    && agentic-ci install-plugins \
+    && git config --global --unset-all url."https://github.com/".insteadOf
+
+ENV CLAUDE_CODE_PLUGIN_SEED_DIR=/sandbox/.claude-seed
+ENV CLAUDE_CODE_SYNC_PLUGIN_INSTALL=1
+ENV DISABLE_AUTOUPDATER=1
+ENV AGENT_TOOL=claude
+ENV CLAUDE_CONFIG_DIR=/sandbox/.claude
+ENTRYPOINT ["entrypoint.sh"]
+CMD ["claude"]
