@@ -1,6 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:base"],
+  "extends": ["config:recommended"],
   "minimumReleaseAge": "7 days",
   "postUpgradeTasks": {
     "commands": ["python3 scripts/bump-versions.py --sync"],
@@ -26,18 +26,20 @@
     },
     {
       "matchDatasources": ["docker"],
-      "matchPackagePrefixes": ["ubi10/"],
-      "minimumReleaseAge": "0 days"
+      "minimumReleaseAge": "0 days",
+      "matchPackageNames": [
+        "ubi10/{/,}**"
+      ]
     }
   ],
   "customManagers": [
     {
       "customType": "regex",
-      "fileMatch": [
-        "^images/runner/shared/Containerfile\\.base$",
-        "^images/runner/shared/Containerfile\\.openshell-base$",
-        "^images/ci/Containerfile\\.podman$",
-        "^images/ci/Containerfile\\.openshell$"
+      "managerFilePatterns": [
+        "/^images/runner/shared/Containerfile\\.base$/",
+        "/^images/runner/shared/Containerfile\\.openshell-base$/",
+        "/^images/ci/Containerfile\\.podman$/",
+        "/^images/ci/Containerfile\\.openshell$/"
       ],
       "matchStrings": ["ARG UV_VERSION=(?<currentValue>[^\\n]+)"],
       "depNameTemplate": "astral-sh/uv",
@@ -47,9 +49,9 @@
     },
     {
       "customType": "regex",
-      "fileMatch": [
-        "^images/runner/shared/Containerfile\\.base$",
-        "^images/runner/shared/Containerfile\\.openshell-base$"
+      "managerFilePatterns": [
+        "/^images/runner/shared/Containerfile\\.base$/",
+        "/^images/runner/shared/Containerfile\\.openshell-base$/"
       ],
       "matchStrings": ["ARG SHELLCHECK_VERSION=(?<currentValue>[^\\n]+)"],
       "depNameTemplate": "koalaman/shellcheck",
@@ -59,11 +61,11 @@
     },
     {
       "customType": "regex",
-      "fileMatch": [
-        "^images/runner/shared/Containerfile\\.base$",
-        "^images/runner/shared/Containerfile\\.openshell-base$",
-        "^images/ci/Containerfile\\.podman$",
-        "^images/ci/Containerfile\\.openshell$"
+      "managerFilePatterns": [
+        "/^images/runner/shared/Containerfile\\.base$/",
+        "/^images/runner/shared/Containerfile\\.openshell-base$/",
+        "/^images/ci/Containerfile\\.podman$/",
+        "/^images/ci/Containerfile\\.openshell$/"
       ],
       "matchStrings": ["ARG GH_VERSION=(?<currentValue>[^\\n]+)"],
       "depNameTemplate": "cli/cli",
@@ -73,11 +75,11 @@
     },
     {
       "customType": "regex",
-      "fileMatch": [
-        "^images/runner/shared/Containerfile\\.base$",
-        "^images/runner/shared/Containerfile\\.openshell-base$",
-        "^images/ci/Containerfile\\.podman$",
-        "^images/ci/Containerfile\\.openshell$"
+      "managerFilePatterns": [
+        "/^images/runner/shared/Containerfile\\.base$/",
+        "/^images/runner/shared/Containerfile\\.openshell-base$/",
+        "/^images/ci/Containerfile\\.podman$/",
+        "/^images/ci/Containerfile\\.openshell$/"
       ],
       "matchStrings": ["ARG GLAB_VERSION=(?<currentValue>[^\\n]+)"],
       "depNameTemplate": "gitlab-org/cli",
@@ -88,9 +90,9 @@
     },
     {
       "customType": "regex",
-      "fileMatch": [
-        "^images/ci/Containerfile\\.podman$",
-        "^images/ci/Containerfile\\.openshell$"
+      "managerFilePatterns": [
+        "/^images/ci/Containerfile\\.podman$/",
+        "/^images/ci/Containerfile\\.openshell$/"
       ],
       "matchStrings": ["ARG ACLI_VERSION=(?<currentValue>[^\\n]+)"],
       "depNameTemplate": "acli",
@@ -100,9 +102,9 @@
     },
     {
       "customType": "regex",
-      "fileMatch": [
-        "^images/ci/Containerfile\\.openshell$",
-        "^images/openshell-supervisor/Containerfile$"
+      "managerFilePatterns": [
+        "/^images/ci/Containerfile\\.openshell$/",
+        "/^images/openshell-supervisor/Containerfile$/"
       ],
       "matchStrings": ["ARG OPENSHELL_VERSION=(?<currentValue>[^\\n]+)"],
       "depNameTemplate": "openshell",
@@ -112,9 +114,9 @@
     },
     {
       "customType": "regex",
-      "fileMatch": [
-        "^images/ci/Containerfile\\.podman$",
-        "^images/ci/Containerfile\\.openshell$"
+      "managerFilePatterns": [
+        "/^images/ci/Containerfile\\.podman$/",
+        "/^images/ci/Containerfile\\.openshell$/"
       ],
       "matchStrings": ["ARG GITLEAKS_VERSION=(?<currentValue>[^\\n]+)"],
       "depNameTemplate": "gitleaks/gitleaks",
@@ -124,9 +126,9 @@
     },
     {
       "customType": "regex",
-      "fileMatch": [
-        "^images/ci/Containerfile\\.podman$",
-        "^images/ci/Containerfile\\.openshell$"
+      "managerFilePatterns": [
+        "/^images/ci/Containerfile\\.podman$/",
+        "/^images/ci/Containerfile\\.openshell$/"
       ],
       "matchStrings": ["ARG VALE_VERSION=(?<currentValue>[^\\n]+)"],
       "depNameTemplate": "vale-cli/vale",
@@ -136,9 +138,9 @@
     },
     {
       "customType": "regex",
-      "fileMatch": [
-        "^images/runner/claude-code/Containerfile$",
-        "^images/runner/claude-code/Containerfile\\.openshell$"
+      "managerFilePatterns": [
+        "/^images/runner/claude-code/Containerfile$/",
+        "/^images/runner/claude-code/Containerfile\\.openshell$/"
       ],
       "matchStrings": ["ARG CLAUDE_VERSION=(?<currentValue>[^\\n]+)"],
       "depNameTemplate": "@anthropic-ai/claude-code",
@@ -147,9 +149,9 @@
     },
     {
       "customType": "regex",
-      "fileMatch": [
-        "^images/runner/opencode/Containerfile$",
-        "^images/runner/opencode/Containerfile\\.openshell$"
+      "managerFilePatterns": [
+        "/^images/runner/opencode/Containerfile$/",
+        "/^images/runner/opencode/Containerfile\\.openshell$/"
       ],
       "matchStrings": ["ARG OPENCODE_VERSION=(?<currentValue>[^\\n]+)"],
       "depNameTemplate": "anomalyco/opencode",
@@ -159,9 +161,9 @@
     },
     {
       "customType": "regex",
-      "fileMatch": [
-        "^images/runner/shared/Containerfile\\.base$",
-        "^images/runner/shared/Containerfile\\.openshell-base$"
+      "managerFilePatterns": [
+        "/^images/runner/shared/Containerfile\\.base$/",
+        "/^images/runner/shared/Containerfile\\.openshell-base$/"
       ],
       "matchStrings": ["ruff==(?<currentValue>[^\\s]+)"],
       "depNameTemplate": "ruff",
@@ -169,11 +171,11 @@
     },
     {
       "customType": "regex",
-      "fileMatch": [
-        "^images/runner/shared/Containerfile\\.base$",
-        "^images/runner/shared/Containerfile\\.openshell-base$",
-        "^images/ci/Containerfile\\.podman$",
-        "^images/ci/Containerfile\\.openshell$"
+      "managerFilePatterns": [
+        "/^images/runner/shared/Containerfile\\.base$/",
+        "/^images/runner/shared/Containerfile\\.openshell-base$/",
+        "/^images/ci/Containerfile\\.podman$/",
+        "/^images/ci/Containerfile\\.openshell$/"
       ],
       "matchStrings": ["agentic-ci==(?<currentValue>[^\\s]+)"],
       "depNameTemplate": "agentic-ci",
@@ -181,8 +183,8 @@
     },
     {
       "customType": "regex",
-      "fileMatch": [
-        "^images/.*Containerfile[^/]*$"
+      "managerFilePatterns": [
+        "/^images/.*Containerfile[^/]*$/"
       ],
       "matchStrings": ["FROM registry\\.access\\.redhat\\.com/(?<depName>ubi10/ubi[^:]*):(?<currentValue>[0-9]+\\.[0-9]+)"],
       "datasourceTemplate": "docker",
