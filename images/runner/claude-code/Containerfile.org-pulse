@@ -15,7 +15,7 @@
 # Layer 1: openshell-base equivalent
 # ═══════════════════════════════════════════════════════════════════════
 
-FROM registry.access.redhat.com/ubi9/ubi-minimal:9.6
+FROM registry.access.redhat.com/ubi10/ubi-minimal:10.2
 
 ARG UV_VERSION=0.11.33
 ARG UV_SHA256=3e95b84d8a8b3390c91584d4fd0c4d326e951da2b8fb15a76719368af2795424
@@ -33,9 +33,10 @@ ARG CLAUDE_VERSION=2.1.220
 ARG CLAUDE_SHA256=674f61f20ff306f3100cf9200e4c36c4b70278b5bef2884549819b942a89c863
 
 RUN microdnf install -y --nodocs \
-        python3.12 \
-        python3.12-pip \
+        python3 \
+        python3-pip \
         git \
+        curl \
         jq \
         make \
         which \
@@ -46,9 +47,6 @@ RUN microdnf install -y --nodocs \
         shadow-utils \
         iproute \
     && microdnf clean all
-
-RUN ln -sf /usr/bin/python3.12 /usr/local/bin/python3 \
-    && ln -sf /usr/bin/python3.12 /usr/local/bin/python
 
 RUN groupadd -g 998 sandbox \
     && useradd -u 998 -g sandbox -m -d /sandbox -s /bin/bash sandbox
@@ -93,7 +91,7 @@ COPY images/runner/shared/entrypoint.sh /usr/local/bin/entrypoint.sh
 COPY pyproject.toml README.md /tmp/agentic-ci/
 COPY src/ /tmp/agentic-ci/src/
 RUN chmod +x /usr/local/bin/entrypoint.sh \
-    && uv pip install --system --python python3.12 --no-cache /tmp/agentic-ci ruff==0.16.0 \
+    && uv pip install --system --no-cache /tmp/agentic-ci ruff==0.16.0 \
     && rm -rf /tmp/agentic-ci \
     && install -d -m 755 -o sandbox /usr/local/share/agentic-ci
 
@@ -113,9 +111,7 @@ WORKDIR /sandbox
 
 USER root
 
-RUN microdnf module enable -y nodejs:22 \
-    && microdnf install -y --nodocs nodejs npm \
-    && microdnf clean all
+RUN microdnf install -y --nodocs nodejs npm && microdnf clean all
 
 RUN curl -fsSL -o /usr/local/bin/claude \
         "https://downloads.claude.ai/claude-code-releases/${CLAUDE_VERSION}/linux-x64/claude" \
