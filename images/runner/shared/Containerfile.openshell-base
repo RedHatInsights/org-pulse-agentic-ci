@@ -15,7 +15,7 @@
 # supervisor images) consumed by the CI image. The podman runner base
 # (images/runner/shared/Containerfile.base) stays on UBI10.
 
-FROM registry.access.redhat.com/ubi9/ubi-minimal:9.6
+FROM registry.access.redhat.com/ubi9/ubi-minimal:9.8-1787647261
 
 ARG UV_VERSION=0.11.33
 ARG UV_SHA256=3e95b84d8a8b3390c91584d4fd0c4d326e951da2b8fb15a76719368af2795424
