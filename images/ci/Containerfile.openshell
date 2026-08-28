@@ -22,7 +22,7 @@
 # (0.0.95+rhaiv.0); the container images use the equivalent tag form
 # (v0.0.95-rhaiv.0) since '+' is not allowed in image tags.
 ARG OPENSHELL_VERSION=0.0.95+rhaiv.0
-ARG OPENSHELL_IMAGE_TAG=v0.0.95-rhaiv.0
+ARG OPENSHELL_IMAGE_TAG=v0.0.112-rhaiv.0
 
 # Gateway binary source. The server is not shipped in the CLI wheel, so
 # the standalone binary is copied out of the published gateway image.
