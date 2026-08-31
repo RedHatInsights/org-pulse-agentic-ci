@@ -1,6 +1,11 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:recommended"],
+  "extends": [
+    "config:recommended",
+    ":disableMajorUpdates",
+    "github>konflux-ci/mintmaker-presets:cve-automerge-all",
+    "helpers:pinGitHubActionDigestsToSemver"
+  ],
   "minimumReleaseAge": "7 days",
   "postUpgradeTasks": {
     "commands": ["python3 scripts/bump-versions.py --sync"],
@@ -17,6 +22,10 @@
     "executionMode": "update"
   },
   "packageRules": [
+    {
+      "matchManagers": ["github-actions"],
+      "groupName": "github actions"
+    },
     {
       "matchPackageNames": [
         "agentic-ci",

@@ -84,25 +84,6 @@ merge_protections:
       - -draft
       - -conflict
 
-  # Dependabot updates GitHub Actions workflow pins (.github/workflows/).
-  # Those paths don't trigger any image workflow, so only base CI is required.
-  - name: dependabot
-    if:
-      - "author=dependabot[bot]"
-    success_conditions:
-      # ci.yml
-      - check-success = Run Tox (py310)
-      - check-success = Run Tox (py311)
-      - check-success = Run Tox (py312)
-      - check-success = Run Tox (py313)
-      - check-success = Run Tox (lint)
-      - check-success = Run Tox (check-format)
-      - check-success = Run Tox (typecheck)
-      # docs.yml
-      - check-success = Build docs
-      - -draft
-      - -conflict
-
   # ---------------------------------------------------------------------------
   # Human PR rules.
   #
@@ -123,7 +104,6 @@ merge_protections:
     if:
       - "author=@opendatahub-io/agentic-ci-maintainers"
       - "-author=aipcc-renovate-bot[bot]"
-      - "-author=dependabot[bot]"
       - "files~=^(images/|tests/images/|tests/e2e/)"
     success_conditions:
       - "#approved-reviews-by>=1"
@@ -163,7 +143,6 @@ merge_protections:
     if:
       - "author=@opendatahub-io/agentic-ci-maintainers"
       - "-author=aipcc-renovate-bot[bot]"
-      - "-author=dependabot[bot]"
       - "-files~=^(images/|tests/images/|tests/e2e/)"
       - "files~=^scripts/bump-versions\\.py$"
     success_conditions:
@@ -191,7 +170,6 @@ merge_protections:
     if:
       - "author=@opendatahub-io/agentic-ci-maintainers"
       - "-author=aipcc-renovate-bot[bot]"
-      - "-author=dependabot[bot]"
       - "-files~=^(images/|tests/images/|tests/e2e/|scripts/bump-versions\\.py$)"
       - "files~=^(src/agentic_ci/|Makefile$|\\.github/actions/setup-podman/|\\.github/workflows/images)"
     success_conditions:
@@ -228,7 +206,6 @@ merge_protections:
     if:
       - "author=@opendatahub-io/agentic-ci-maintainers"
       - "-author=aipcc-renovate-bot[bot]"
-      - "-author=dependabot[bot]"
       - "-files~=^(images/|tests/images/|tests/e2e/|scripts/bump-versions\\.py$|src/agentic_ci/|Makefile$|\\.github/actions/setup-podman/|\\.github/workflows/images)"
     success_conditions:
       - "#approved-reviews-by>=1"
@@ -252,7 +229,6 @@ merge_protections:
     if:
       - "-author=@opendatahub-io/agentic-ci-maintainers"
       - "-author=aipcc-renovate-bot[bot]"
-      - "-author=dependabot[bot]"
       - "files~=^(images/|tests/images/|tests/e2e/)"
     success_conditions:
       - "#approved-reviews-by>=2"
@@ -291,7 +267,6 @@ merge_protections:
     if:
       - "-author=@opendatahub-io/agentic-ci-maintainers"
       - "-author=aipcc-renovate-bot[bot]"
-      - "-author=dependabot[bot]"
       - "-files~=^(images/|tests/images/|tests/e2e/)"
       - "files~=^scripts/bump-versions\\.py$"
     success_conditions:
@@ -318,7 +293,6 @@ merge_protections:
     if:
       - "-author=@opendatahub-io/agentic-ci-maintainers"
       - "-author=aipcc-renovate-bot[bot]"
-      - "-author=dependabot[bot]"
       - "-files~=^(images/|tests/images/|tests/e2e/|scripts/bump-versions\\.py$)"
       - "files~=^(src/agentic_ci/|Makefile$|\\.github/actions/setup-podman/|\\.github/workflows/images)"
     success_conditions:
@@ -355,7 +329,6 @@ merge_protections:
     if:
       - "-author=@opendatahub-io/agentic-ci-maintainers"
       - "-author=aipcc-renovate-bot[bot]"
-      - "-author=dependabot[bot]"
       - "-files~=^(images/|tests/images/|tests/e2e/|scripts/bump-versions\\.py$|src/agentic_ci/|Makefile$|\\.github/actions/setup-podman/|\\.github/workflows/images)"
     success_conditions:
       - "#approved-reviews-by>=2"
