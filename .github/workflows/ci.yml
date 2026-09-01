@@ -29,7 +29,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
-          python-version: "3.12"
+          python-version: "3.14"
       - name: Run MLflow E2E tests
         run: pip install tox && tox -e mlflow-e2e
     runs-on: ubuntu-latest
