@@ -28,7 +28,7 @@ ARG OPENSHELL_IMAGE_TAG=v0.0.95-rhaiv.0
 # the standalone binary is copied out of the published gateway image.
 FROM quay.io/opendatahub/odh-openshell-gateway:${OPENSHELL_IMAGE_TAG} AS gateway
 
-FROM registry.access.redhat.com/ubi9/ubi:9.6
+FROM registry.access.redhat.com/ubi9/ubi:9.8-1788245065
 
 ARG GH_VERSION=2.96.0
 ARG GH_SHA256=83d5c2ccad5498f58bf6368acb1ab32588cf43ab3a4b1c301bf36328b1c8bd60
